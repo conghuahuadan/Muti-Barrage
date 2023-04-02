@@ -38,6 +38,8 @@ public class MainActivity extends AppCompatActivity implements MainAdapter.OnSel
         setContentView(R.layout.activity_main);
 
         initWidget();
+
+        MutiBarrageActivity.show(this);
     }
 
     private void initWidget() {

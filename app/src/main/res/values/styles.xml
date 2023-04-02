@@ -15,5 +15,4 @@
         <item name="android:windowBackground">@null</item>
         <item name="android:windowIsTranslucent">true</item>
     </style>
-
 </resources>

@@ -196,6 +196,7 @@ public abstract class BarrageAdapter<T extends DataSource>
     }
 
     public abstract static class BarrageViewHolder<T> {
+
         public T mData;
         private View itemView;
 
@@ -203,7 +204,7 @@ public abstract class BarrageAdapter<T extends DataSource>
             this.itemView = itemView;
         }
 
-        View getItemView() {
+        public View getItemView() {
             return itemView;
         }
 
