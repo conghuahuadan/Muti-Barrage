@@ -53,7 +53,7 @@ public abstract class BarrageAdapter<T extends DataSource>
     private ExecutorService mService = Executors.newSingleThreadExecutor();
     // 主线程的Handler
     private BarrageAdapterHandler<T> mHandler = new BarrageAdapterHandler<>(Looper.getMainLooper(), this);
-
+    private boolean isPause;
 
     @SuppressWarnings("WeakerAccess")
     public BarrageAdapter(AdapterListener<T> adapterListener, Context context) {
@@ -243,6 +243,9 @@ public abstract class BarrageAdapter<T extends DataSource>
 
     private void sendMsg(int len) {
         for (int i = 0; i < len; i++) {
+            if (isPause) {
+                break;
+            }
             mHandler.sendEmptyMessage(MSG_CREATE_VIEW);
             try {
                 Thread.sleep(interval * 20);
@@ -250,6 +253,15 @@ public abstract class BarrageAdapter<T extends DataSource>
                 e.printStackTrace();
             }
         }
+    }
+
+    public void pause() {
+        isPause = true;
+    }
+
+    public void resume() {
+        isPause = false;
+        mService.submit(new DelayRunnable(mDataList.size()));
     }
 
     public static class BarrageAdapterHandler<T extends DataSource> extends Handler {
@@ -280,6 +292,5 @@ public abstract class BarrageAdapter<T extends DataSource>
             }
 
         }
-
     }
 }

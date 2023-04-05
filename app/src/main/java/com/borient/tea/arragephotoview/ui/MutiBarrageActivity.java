@@ -6,9 +6,11 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -36,9 +38,11 @@ public class MutiBarrageActivity extends AppCompatActivity {
 
     private Button btnTest;
     private BarrageView barrageView;
+    private FrameLayout barrageDetailContainer;
     private BarrageAdapter<BarrageData> mAdapter;
     private View barrageDetail;
     private Handler handler = new Handler();
+    private BarrageDetailLayout detailLayout;
 
     public static void show(Context context) {
         Intent intent = new Intent(context, MutiBarrageActivity.class);
@@ -52,10 +56,18 @@ public class MutiBarrageActivity extends AppCompatActivity {
 
         btnTest = findViewById(R.id.btn_test);
         barrageView = findViewById(R.id.barrage);
+        detailLayout = findViewById(R.id.barrage_detail_layout);
 
         initBarrage();
 
         barrageDetail = findViewById(R.id.barrage_detail);
+
+        barrageView.setCallback(new BarrageView.Callback() {
+            @Override
+            public void onDispatchTouchEvent(MotionEvent ev) {
+                detailLayout.hideDetail();
+            }
+        });
     }
 
     public void onTestClick(View view) {
@@ -64,87 +76,22 @@ public class MutiBarrageActivity extends AppCompatActivity {
         }
     }
 
-    private void animInBarrage(final View itemView) {
-//        int offsetY = (barrageDetail.getHeight() - itemView.getHeight()) / 2;
-//        ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) barrageDetail.getLayoutParams();
-//        params.topMargin = itemView.getTop() - offsetY;
-//        barrageDetail.requestLayout();
-//        int itemViewMiddle = (itemView.getLeft() + itemView.getRight()) / 2;
-//        int parentMiddle = (barrageView.getLeft() + barrageView.getRight()) / 2;
-//        barrageDetail.setTranslationX(itemViewMiddle - parentMiddle);
-        itemView.setVisibility(View.VISIBLE);
-        ViewAnimator.animate(itemView)
-                .alpha(1, 0)
-                .scale(1, 0)
-                .duration(200)
-                .onStop(new AnimationListener.Stop() {
-                    @Override
-                    public void onStop() {
-                        itemView.setVisibility(View.INVISIBLE);
-                    }
-                })
-                .start();
-        barrageDetail.setVisibility(View.VISIBLE);
-        ViewAnimator.animate(barrageDetail)
-                .alpha(0, 1)
-                .scale(0, 1)
-//                .translationX(barrageDetail.getTranslationX(), 0)
-                .duration(450)
-                .start();
+    public void onPauseClick(View view) {
+        if (barrageView != null) {
+            barrageView.pause();
+        }
     }
 
-    private void animOutBarrage(final View itemView) {
-//        int itemViewMiddle = (itemView.getLeft() + itemView.getRight()) / 2;
-//        int parentMiddle = (barrageView.getLeft() + barrageView.getRight()) / 2;
-        barrageDetail.setVisibility(View.VISIBLE);
-        ViewAnimator.animate(barrageDetail)
-                .alpha(1, 0)
-                .scale(1, 0)
-//                .translationX(0, itemViewMiddle - parentMiddle)
-                .duration(450)
-                .onStop(new AnimationListener.Stop() {
-                    @Override
-                    public void onStop() {
-                        itemView.setVisibility(View.VISIBLE);
-                        ViewAnimator.animate(itemView)
-                                .alpha(0, 1)
-                                .scale(0, 1)
-                                .duration(200)
-                                .start();
-                    }
-                })
-                .start();
-    }
-
-    private AnimOutTask animOutTask;
-
-    private class AnimOutTask implements Runnable {
-
-        View itemView;
-
-        public AnimOutTask(View itemView) {
-            this.itemView = itemView;
-        }
-
-        @Override
-        public void run() {
-            animOutBarrage(itemView);
-        }
-
-        public void cancel() {
-            ViewAnimator.animate(itemView)
-                    .alpha(0, 1)
-                    .scale(0, 1)
-                    .duration(200)
-                    .start();
-            itemView.setVisibility(View.VISIBLE);
+    public void onResumeClick(View view) {
+        if (barrageView != null) {
+            barrageView.resume();
         }
     }
 
     private void initBarrage() {
         BarrageView.Options options = new BarrageView.Options()
                 .setGravity(BarrageView.GRAVITY_TOP)                // 设置弹幕的位置
-                .setInterval(50)                                     // 设置弹幕的发送间隔
+                .setInterval(70)                                     // 设置弹幕的发送间隔
                 .setModel(BarrageView.MODEL_COLLISION_DETECTION)     // 设置弹幕生成模式
                 .setClick(true);                                     // 设置弹幕是否可以点击
         barrageView.setOptions(options);
@@ -180,17 +127,7 @@ public class MutiBarrageActivity extends AppCompatActivity {
             public void onItemClick(final BarrageAdapter.BarrageViewHolder<BarrageData> holder, BarrageData item) {
                 Toast.makeText(MutiBarrageActivity.this, item.getContent() + "点击了一次", Toast.LENGTH_SHORT).show();
                 View itemView = holder.getItemView();
-                Log.i(TAG, "onItemClick: " + itemView.getTop() + ", " + itemView.getLeft() + ", " + itemView.getRight());
-                if (barrageDetail != null) {
-                    animInBarrage(itemView);
-                    if (animOutTask != null) {
-                        handler.removeCallbacks(animOutTask);
-                        animOutTask.cancel();
-                    }
-                    animOutTask = new AnimOutTask(itemView);
-                    handler.removeCallbacks(animOutTask);
-                    handler.postDelayed(animOutTask, 5 * 1000);
-                }
+                detailLayout.showDetail(itemView);
             }
         });
     }

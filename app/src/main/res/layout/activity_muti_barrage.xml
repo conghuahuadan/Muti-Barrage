@@ -24,25 +24,39 @@
         android:background="@android:color/holo_blue_bright"
         android:paddingTop="10dp" />
 
-    <LinearLayout
-        android:id="@+id/barrage_detail"
-        android:layout_width="250dp"
-        android:layout_marginTop="40dp"
-        android:layout_height="30dp"
+    <com.borient.tea.arragephotoview.ui.BarrageDetailLayout
+        android:id="@+id/barrage_detail_layout"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
         android:layout_alignTop="@+id/barrage"
-        android:layout_centerHorizontal="true"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:background="#70000000"
-        android:orientation="horizontal">
+        android:layout_alignBottom="@id/barrage">
 
-    </LinearLayout>
+    </com.borient.tea.arragephotoview.ui.BarrageDetailLayout>
 
-    <Button
-        android:id="@+id/btn_test"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:onClick="onTestClick"
-        android:text="test" />
+        android:layout_alignParentBottom="true">
+
+        <Button
+            android:id="@+id/btn_test"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="onTestClick"
+            android:text="test" />
+
+        <Button
+            android:id="@+id/btn_pause"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="onPauseClick"
+            android:text="pause" />
+
+        <Button
+            android:id="@+id/btn_resume"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="onResumeClick"
+            android:text="resume" />
+    </LinearLayout>
 </RelativeLayout>

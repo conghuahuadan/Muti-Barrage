@@ -7,6 +7,7 @@ import android.content.Context;
 import android.os.Handler;
 import android.os.Message;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.MotionEvent;
 import android.view.View;
@@ -95,6 +96,12 @@ public class BarrageView extends ViewGroup implements IBarrageView {
     private CountDownLatch countDownLatch = new CountDownLatch(1);
     private List<ValueAnimator> animators = new ArrayList<>();
 
+    private Callback callback;
+
+    public void setCallback(Callback callback) {
+        this.callback = callback;
+    }
+
     public BarrageView(Context context) {
         this(context, null);
     }
@@ -110,7 +117,6 @@ public class BarrageView extends ViewGroup implements IBarrageView {
         this.barrageList = new ArrayList<>();
         this.mArray = new SparseArray<>();
         mHandler = new BarrageHandler(this);
-
     }
 
     /**
@@ -579,6 +585,9 @@ public class BarrageView extends ViewGroup implements IBarrageView {
     }
 
     public void pause() {
+        if (mAdapter != null) {
+            mAdapter.pause();
+        }
         for (ValueAnimator item : animators) {
             if (item != null) {
                 item.pause();
@@ -592,5 +601,21 @@ public class BarrageView extends ViewGroup implements IBarrageView {
                 item.resume();
             }
         }
+        if (mAdapter != null) {
+            mAdapter.resume();
+        }
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        if (callback != null) {
+            callback.onDispatchTouchEvent(ev);
+        }
+        return super.dispatchTouchEvent(ev);
+    }
+
+    public interface Callback {
+
+        void onDispatchTouchEvent(MotionEvent ev);
     }
 }
